@@ -32,6 +32,11 @@ const PATH_SELECT_END = 3;
 const GAME_READY = 1;
 const GAME_PLAYING = 2;
 const GAME_COMPLETE = 3;
+const moveStack = [];
+const DIRECTION_UP = 1;
+const DIRECTION_RIGHT = 2;
+const DIRECTION_BOTTOM = 3;
+const DIRECTION_LEFT = 4;
 
 let pathStatus = PATH_DONE;
 let gameStatus = GAME_READY;
@@ -42,6 +47,12 @@ let playerGraphicStatus = 0;
 let frameTime = 0;
 let startTime = null;
 let hintFlag = false;
+let supportMotionCtrl = false;
+let enableMotionCtrl = false;
+let motionDirection = 0;
+let motionInterval = 0;
+let motionFn;
+let motionTaskFlag;
 
 function onload() {
   //maze size auto fit screen size
@@ -52,6 +63,19 @@ function onload() {
     (document.querySelector(".content").clientHeight - 2 * mazeMargin) /
       mazeGridWidth
   );
+
+  if ("motion-ctrl-ct") {
+    motionCtrlField;
+  }
+
+  // reference: https://stackoverflow.com/questions/56514116/how-do-i-get-deviceorientationevent-and-devicemotionevent-to-work-on-safari
+  if (location.protocol != "https:") {
+    let mazeCanvas = document.getElementById("motionCtrlField");
+    // mazeCanvas.style.display = "none";
+  } else {
+    supportMotionCtrl = true;
+  }
+  supportMotionCtrl = true;
 
   setupEventListener();
   setNewMaze();
@@ -100,59 +124,86 @@ function setupEventListener() {
     }
   });
 
+  document.getElementById("motionCtrl").addEventListener("click", function () {
+    enableMotionCtrl = document.getElementById("myCheck").checked;
+  });
   window.addEventListener("devicemotion", onDevicemotion);
 }
 
 function onDevicemotion(event) {
+  if ((enableMotionCtrl && supportMotionCtrl) === false) {
+    return;
+  }
+
   const x = event.accelerationIncludingGravity.x;
   const y = event.accelerationIncludingGravity.y;
-  document.getElementById("debugmessage").innerText = event.interval;
-  //   event.accelerationIncludingGravity.x;
+
   const absX = Math.abs(x);
   const absY = Math.abs(y);
-  let moveFn;
   let value;
+  let direction;
+
   if (absX > absY) {
     const roundX = Math.round(x);
 
     if (roundX === 0) {
+      clearTimeout(motionTaskFlag);
+      motionFn = null;
       return;
     }
 
     value = roundX;
-    moveFn = roundX > 0 ? moveLeft : moveRight;
+    if (roundX > 0) {
+      motionFn = moveLeft;
+      direction = DIRECTION_LEFT;
+    } else {
+      motionFn = moveRight;
+      direction = DIRECTION_RIGHT;
+    }
   } else {
     const roundY = Math.round(y);
 
     if (roundY === 0) {
+      clearTimeout(motionTaskFlag);
+      motionFn = null;
       return;
     }
 
-    value = roundY;
-    moveFn = roundY > 0 ? moveDown : moveUp;
+    if (roundY > 0) {
+      motionFn = moveDown;
+      direction = DIRECTION_BOTTOM;
+    } else {
+      motionFn = moveUp;
+      direction = DIRECTION_UP;
+    }
   }
 
   switch (Math.abs(value)) {
     case 10:
     case 9:
     case 8:
-      moveFn();
-      moveFn();
-      moveFn();
+      motionInterval = 1000 / 3;
       break;
     case 7:
     case 6:
     case 5:
-      moveFn();
-      moveFn();
+      motionInterval = 1000 / 2;
       break;
     case 4:
     case 3:
     case 2:
     case 1:
-      moveFn();
+      motionInterval = 1000;
       break;
   }
+}
+
+function setupMotionTask(fn, interval) {
+  clearTimeout(motionTaskFlag);
+  motionTaskFlag = setTimeout(() => {
+    fn();
+    setupMotionTask(fn, interval);
+  }, interval);
 }
 
 function setNewMaze() {

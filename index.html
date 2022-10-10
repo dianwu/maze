@@ -13,7 +13,7 @@
   <body style="text-align: center" onload="onload()">
     <div class="box">
       <div class="row header">
-        <h2 style="margin: 0.3rem">Eller's Algorithm Maze Generator</h2>
+        <h2 style="margin: 0.3rem">迷宮大挑戰</h2>
         <div class="control-bar">
           <div class="size-ct">
             Width: <input type="number" id="mazeWidth" value="" /> Height:
@@ -27,6 +27,10 @@
               onclick="hintPath()"
               value="Hint Path"
             />
+            <span class="motion-ctrl-ct" id="motionCtrlField">
+              動作感應：
+              <input type="checkbox" id="motionCtrl" />
+            </span>
           </div>
           <div class="player-control-ct">
             <input
@@ -58,9 +62,7 @@
         </div>
       </div>
       <div class="row footer">
-        <p style="margin: 0.5rem">
-            <div id="debugmessage" style="text-align: center">&nbsp;</div>
-        </p>
+        <p style="margin: 0.5rem"></p>
       </div>
     </div>
   </body>
