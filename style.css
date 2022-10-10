@@ -1,0 +1,67 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+input[type="number"] {
+  width: 2.5rem;
+}
+
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+
+.box .row.header {
+  flex: 0 1 auto;
+}
+
+.box .row.content {
+  display: flex;
+  flex-flow: column;
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+.box .row.footer {
+  flex: 0 1 auto;
+}
+
+.control-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 20px auto 1fr;
+  grid-template-rows: auto 10px 1fr 10px auto 10px;
+}
+
+.size-ct {
+  grid-area: 1/2/1/2;
+}
+
+.game-control-ct {
+  grid-area: 1/4/1/4;
+}
+
+.player-control-ct {
+  grid-area: 3/2/3/5;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+#btnUp {
+  grid-area: 1/2/1/2;
+}
+#btnLeft {
+  grid-area: 2/1/2/1;
+}
+#btnDown {
+  grid-area: 2/2/2/2;
+}
+#btnRight {
+  grid-area: 2/3/2/3;
+}
+
+#message {
+  grid-area: 5/1/5/6;
+}

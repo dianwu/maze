@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maze Generator</title>
+    <script src="Eller.js"></script>
+    <script src="AStarCustomMap.js"></script>
+    <script src="UI.js" defer></script>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+
+  <body style="text-align: center" onload="onload()">
+    <div class="box">
+      <div class="row header">
+        <h2 style="margin: 0.3rem">Eller's Algorithm Maze Generator</h2>
+        <div class="control-bar">
+          <div class="size-ct">
+            Width: <input type="number" id="mazeWidth" value="" /> Height:
+            <input type="number" id="mazeHeight" value="" />
+          </div>
+          <div class="game-control-ct">
+            <input type="button" onclick="setNewMaze()" value="New Maze" />
+            <input
+              type="button"
+              id="btnSetupPath"
+              onclick="hintPath()"
+              value="Hint Path"
+            />
+          </div>
+          <div class="player-control-ct">
+            <input
+              type="button"
+              id="btnLeft"
+              onclick="moveLeft()"
+              value="Left"
+            />
+            <input type="button" id="btnUp" onclick="moveUp()" value="Up" />
+            <input
+              type="button"
+              id="btnDown"
+              onclick="moveDown()"
+              value="Down"
+            />
+            <input
+              type="button"
+              id="btnRight"
+              onclick="moveRight()"
+              value="Right"
+            />
+          </div>
+          <div id="message" style="text-align: center">&nbsp;</div>
+        </div>
+      </div>
+      <div class="row content">
+        <div>
+          <canvas id="mazeCanvas"></canvas>
+        </div>
+      </div>
+      <div class="row footer">
+        <p style="margin: 0.5rem">
+            <div id="debugmessage" style="text-align: center">&nbsp;</div>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
