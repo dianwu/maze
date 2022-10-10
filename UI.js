@@ -1,7 +1,5 @@
 const MAZE_MIN_LENGTH = 5;
 const MAZE_MAX_LENGTH = 30;
-let selectMazeWidth = document.querySelector("#mazeWidth");
-let selectMazeHeight = document.querySelector("#mazeHeight");
 
 let mazeMargin = 2; //px
 let mazeGridWidth = 30; //px
@@ -53,29 +51,19 @@ let motionDirection = 0;
 let motionInterval = 0;
 let motionFn;
 let motionTaskFlag;
+let setupAnimFrameTaskFlag;
 
 function onload() {
   //maze size auto fit screen size
-  selectMazeWidth.value = Math.floor(
-    (window.innerWidth - 10 * mazeMargin) / mazeGridWidth
-  );
-  selectMazeHeight.value = Math.floor(
-    (document.querySelector(".content").clientHeight - 2 * mazeMargin) /
-      mazeGridWidth
-  );
-
-  if ("motion-ctrl-ct") {
-    motionCtrlField;
-  }
 
   // reference: https://stackoverflow.com/questions/56514116/how-do-i-get-deviceorientationevent-and-devicemotionevent-to-work-on-safari
   if (location.protocol != "https:") {
     let mazeCanvas = document.getElementById("motionCtrlField");
-    // mazeCanvas.style.display = "none";
+    mazeCanvas.style.display = "none";
   } else {
     supportMotionCtrl = true;
   }
-  supportMotionCtrl = true;
+  //   supportMotionCtrl = true;
 
   setupEventListener();
   setNewMaze();
@@ -83,6 +71,7 @@ function onload() {
 }
 
 function setupAnimFrameTask() {
+  window.cancelAnimationFrame(setupAnimFrameTaskFlag);
   reDrawMaze();
   if (gameStatus === GAME_PLAYING) {
     let spendTime = Date.now() - startTime;
@@ -94,7 +83,7 @@ function setupAnimFrameTask() {
   }
 
   if (gameStatus !== GAME_COMPLETE) {
-    window.requestAnimationFrame(setupAnimFrameTask);
+    setupAnimFrameTaskFlag = window.requestAnimationFrame(setupAnimFrameTask);
   }
 }
 
@@ -124,9 +113,10 @@ function setupEventListener() {
     }
   });
 
-  document.getElementById("motionCtrl").addEventListener("click", function () {
-    enableMotionCtrl = document.getElementById("myCheck").checked;
+  document.getElementById("motionCtrl").addEventListener("click", function (e) {
+    enableMotionCtrl = e.target.checked;
   });
+
   window.addEventListener("devicemotion", onDevicemotion);
 }
 
@@ -135,9 +125,14 @@ function onDevicemotion(event) {
     return;
   }
 
+  window.removeEventListener("devicemotion", onDevicemotion);
+  window.requestAnimationFrame(() =>
+    window.addEventListener("devicemotion", onDevicemotion)
+  );
+
   const x = event.accelerationIncludingGravity.x;
   const y = event.accelerationIncludingGravity.y;
-  document.getElementById("debugmessage").innerText = `x: ${x} y:${y}`;
+  //   document.getElementById("debugmessage").innerText = `x: ${x} y:${y}`;
   const absX = Math.abs(x);
   const absY = Math.abs(y);
   let value;
@@ -178,17 +173,22 @@ function onDevicemotion(event) {
     }
   }
 
+  if (motionDirection !== direction) {
+    motionDirection === direction;
+    clearTimeout(motionTaskFlag);
+  }
+
   switch (Math.abs(value)) {
     case 10:
     case 9:
-    case 8:
       motionInterval = 1000 / 3;
       break;
+    case 8:
     case 7:
     case 6:
-    case 5:
       motionInterval = 1000 / 2;
       break;
+    case 5:
     case 4:
     case 3:
     case 2:
@@ -196,20 +196,25 @@ function onDevicemotion(event) {
       motionInterval = 1000;
       break;
   }
+
+  setupMotionTask(motionFn, motionInterval);
 }
 
 function setupMotionTask(fn, interval) {
+  fn();
   clearTimeout(motionTaskFlag);
   motionTaskFlag = setTimeout(() => {
-    fn();
     setupMotionTask(fn, interval);
   }, interval);
 }
 
 function setNewMaze() {
   context.clearRect(0, 0, mazeCanvas.width, mazeCanvas.height);
-  mazeWidth = parseInt(selectMazeWidth.value, 10);
-  mazeHeight = parseInt(selectMazeHeight.value, 10);
+  mazeWidth = Math.floor((window.innerWidth - 10 * mazeMargin) / mazeGridWidth);
+  mazeHeight = Math.floor(
+    (document.querySelector(".content").clientHeight - 2 * mazeMargin) /
+      mazeGridWidth
+  );
   setupMaze(mazeWidth, mazeHeight);
   pathStatus = PATH_DONE;
   // reset
@@ -222,7 +227,7 @@ function setNewMaze() {
   getRandomPoint();
   startTime = null;
   gameStatus = GAME_READY;
-  console.log("points", points);
+  setupAnimFrameTask();
 }
 
 function startPath() {
@@ -230,7 +235,6 @@ function startPath() {
 }
 
 function changeMazePathStatus() {
-  console.log("changeMazePathStatus", pathStatus);
   switch (pathStatus) {
     case PATH_DONE:
       pathStatus = PATH_NONE;
@@ -619,5 +623,4 @@ function getPointInfo(x, y) {
 
 function showPointInfo() {
   const [x, y] = currentPoint;
-  console.log("moveRight", x, y, maze[y].Cells[x]);
 }
