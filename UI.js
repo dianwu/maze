@@ -132,7 +132,7 @@ function onDevicemotion(event) {
     moveFn = roundY > 0 ? moveDown : moveUp;
   }
 
-  switch (Math.round(value)) {
+  switch (Math.abs(value)) {
     case 10:
     case 9:
     case 8:
