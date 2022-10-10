@@ -120,7 +120,7 @@ function onDevicemotion(event) {
     }
 
     value = roundX;
-    moveFn = roundX > 0 ? moveRight : moveLeft;
+    moveFn = roundX > 0 ? moveLeft : moveRight;
   } else {
     const roundY = Math.round(y);
 
