@@ -137,7 +137,7 @@ function onDevicemotion(event) {
 
   const x = event.accelerationIncludingGravity.x;
   const y = event.accelerationIncludingGravity.y;
-
+  document.getElementById("debugmessage").innerText = `x: ${x} y:${y}`;
   const absX = Math.abs(x);
   const absY = Math.abs(y);
   let value;
