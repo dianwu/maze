@@ -52,6 +52,22 @@ let motionInterval = 0;
 let motionFn;
 let motionTaskFlag;
 let setupAnimFrameTaskFlag;
+let isiOS = false;
+
+function iOS() {
+  return (
+    [
+      "iPad Simulator",
+      "iPhone Simulator",
+      "iPod Simulator",
+      "iPad",
+      "iPhone",
+      "iPod",
+    ].includes(navigator.platform) ||
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+  );
+}
 
 function onload() {
   //maze size auto fit screen size
@@ -64,7 +80,7 @@ function onload() {
     supportMotionCtrl = true;
   }
   //   supportMotionCtrl = true;
-
+  isiOS = iOS();
   setupEventListener();
   setNewMaze();
   setupAnimFrameTask();
@@ -115,31 +131,92 @@ function setupEventListener() {
 
   document.getElementById("motionCtrl").addEventListener("click", function (e) {
     enableMotionCtrl = e.target.checked;
+    if (
+      typeof DeviceMotionEvent !== "undefined" &&
+      typeof DeviceMotionEvent.requestPermission === "function"
+    ) {
+      // (optional) Do something before API request prompt.
+      DeviceMotionEvent.requestPermission()
+        .then((response) => {
+          // (optional) Do something after API prompt dismissed.
+          if (response == "granted") {
+            window.addEventListener("devicemotion", onDevicemotion);
+          }
+        })
+        .catch(console.error);
+    } else {
+    }
   });
 
   window.addEventListener("devicemotion", onDevicemotion);
+
+  document.addEventListener(
+    "touchstart",
+    (event) => {
+      if (event.touches.length > 1) {
+        event.preventDefault();
+      }
+    },
+    { passive: false }
+  );
+
+  let lastTouchEnd = 0;
+  document.addEventListener(
+    "touchend",
+    (event) => {
+      const now = new Date().getTime();
+      if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+      }
+      lastTouchEnd = now;
+    },
+    false
+  );
+
+  document.getElementById("btnUp").addEventListener("click", (e) => {
+    e.preventDefault();
+    moveUp();
+  });
+  document.getElementById("btnDown").addEventListener("click", (e) => {
+    e.preventDefault();
+    moveDown();
+  });
+  document.getElementById("btnLeft").addEventListener("click", (e) => {
+    e.preventDefault();
+    moveLeft();
+  });
+  document.getElementById("btnRight").addEventListener("click", (e) => {
+    e.preventDefault();
+    moveRight();
+  });
 }
+
+let devicemotionT = 0;
 
 function onDevicemotion(event) {
   if ((enableMotionCtrl && supportMotionCtrl) === false) {
     return;
   }
 
-  window.removeEventListener("devicemotion", onDevicemotion);
-  window.requestAnimationFrame(() =>
-    window.addEventListener("devicemotion", onDevicemotion)
-  );
+  /**
+   * Use timing throttle
+   */
+  const current = Date.now();
+  if (current - devicemotionT < 100) {
+    return;
+  }
+  devicemotionT = current;
 
   const x = event.accelerationIncludingGravity.x;
   const y = event.accelerationIncludingGravity.y;
-  //   document.getElementById("debugmessage").innerText = `x: ${x} y:${y}`;
+  // document.getElementById("debugmessage").innerText = `x: ${x} y:${y}`;
   const absX = Math.abs(x);
   const absY = Math.abs(y);
   let value;
   let direction;
 
   if (absX > absY) {
-    const roundX = Math.round(x);
+    const roundX = Math.round(x) * (isiOS ? -1 : 1);
 
     if (roundX === 0) {
       clearTimeout(motionTaskFlag);
@@ -156,7 +233,7 @@ function onDevicemotion(event) {
       direction = DIRECTION_RIGHT;
     }
   } else {
-    const roundY = Math.round(y);
+    const roundY = Math.round(y) * (isiOS ? -1 : 1);
 
     if (roundY === 0) {
       clearTimeout(motionTaskFlag);

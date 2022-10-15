@@ -4,6 +4,11 @@ body {
   margin: 0;
 }
 
+html,
+body {
+  touch-action: manipulation;
+}
+
 input[type="number"] {
   width: 2.5rem;
 }

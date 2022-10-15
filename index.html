@@ -2,7 +2,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" /> -->
+    <meta name = "viewport" content = "user-scalable=no, width=device-width">
     <title>Maze Generator</title>
     <script src="Eller.js"></script>
     <script src="AStarCustomMap.js"></script>
@@ -29,25 +30,10 @@
             </span>
           </div>
           <div class="player-control-ct">
-            <input
-              type="button"
-              id="btnLeft"
-              onclick="moveLeft()"
-              value="Left"
-            />
-            <input type="button" id="btnUp" onclick="moveUp()" value="Up" />
-            <input
-              type="button"
-              id="btnDown"
-              onclick="moveDown()"
-              value="Down"
-            />
-            <input
-              type="button"
-              id="btnRight"
-              onclick="moveRight()"
-              value="Right"
-            />
+            <input type="button" id="btnLeft" value="Left" />
+            <input type="button" id="btnUp"  value="Up" />
+            <input type="button" id="btnDown" value="Down" />
+            <input type="button" id="btnRight" value="Right"/>
           </div>
           <div id="message" style="text-align: center">&nbsp;</div>
         </div>
